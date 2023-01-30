@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 *.yaml
-!example.yaml
+!portfolio.yaml
 
 results*/
