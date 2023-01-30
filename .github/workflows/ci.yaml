@@ -18,12 +18,7 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
           python3 portfolio.py
-      - name: Pull request artifacts
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: gavv/pull-request-artifacts@v1.0.0
+      - uses: actions/upload-artifact@v3
         with:
-          commit: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.TOKEN_KEY }}
-          artifacts-branch: ${{ github.head_ref }}-artifacts
-          artifacts: |
-            results/
+          name: run-results
+          path: results/
