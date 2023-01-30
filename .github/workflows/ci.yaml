@@ -1,1 +1,29 @@
+name: ECE 285 CI
 
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  run-ci:
+    runs-on: ubuntu-latest
+    container:
+      image: sisaha9/ece285_finance_wi23:stable
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Run Script
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          python3 portfolio.py
+      - name: Pull request artifacts
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: gavv/pull-request-artifacts@v1.0.0
+        with:
+          commit: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.TOKEN_KEY }}
+          artifacts-branch: ${{ github.head_ref }}-artifacts
+          artifacts: |
+            results/
