@@ -18,7 +18,8 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
           python3 portfolio.py
-      - uses: actions/upload-artifact@v3
+      - name: Upload Run results
+        uses: actions/upload-artifact@v3
         with:
           name: run-results
           path: results/
