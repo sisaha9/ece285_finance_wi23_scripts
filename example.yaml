@@ -1,10 +1,8 @@
 DATA:
-  GLD_PRICES: "data/GLD.csv"
-  LOGBOOK: "data/Logbook.csv"
+  TRADE_HISTORY: "data/TradeHistory.csv"
 BANK:
   INITIAL_MONEY: 10000.0
-PORTFOLIO_GENERATION:
+PORTFOLIO_VALUATION:
   DATES: ["1/13/2023", "1/20/2023", "1/27/2023"]
 ACCOUNT:
-  EMAIL: "email_address"
-  PASSWORD: "password"
+  API_KEY: "Polygon.IO API Key"
