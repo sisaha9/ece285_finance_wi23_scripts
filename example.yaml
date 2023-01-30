@@ -4,5 +4,4 @@ BANK:
   INITIAL_MONEY: 10000.0
 PORTFOLIO_VALUATION:
   DATES: ["1/13/2023", "1/20/2023", "1/27/2023"]
-ACCOUNT:
-  API_KEY: "Polygon.IO API Key"
+  LABELS: ["End of Week 1", "End of Week 2", "End of Week 3"]
