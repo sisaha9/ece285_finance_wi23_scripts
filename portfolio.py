@@ -13,13 +13,14 @@ metadata_fp = "portfolio.yaml"
 STOCK_TICKER_LENGTH = 3
 SLEEP_TIME = 60 + 10
 STOCK_PRICE_PURCHASE_INDICATOR = "low"
-STOCK_PRICE_VALUATION_INDICATOR = "high"
+STOCK_PRICE_VALUATION_INDICATOR = "close"
 OPTION_PRICE_PURCHASE_INDICATOR = "low"
-OPTION_PRICE_VALUATION_INDICATOR = "high"
+OPTION_PRICE_VALUATION_INDICATOR = "close"
 RESULTS_DIR = "results"
 ROUND_TO = 2
 MIN_HEIGHT = 0
 XROT = 45
+Y_OFFSET = 4
 FIGSIZE=(20,20)
 
 API_KEY = os.environ['API_KEY']
@@ -118,7 +119,7 @@ def main():
         print(df)
         print(total_portfolio_value)
         label_name = metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][portfolio_idx]
-        valuations["Labels"].append(f"{label_name}-{int(total_portfolio_value)}")
+        valuations["Labels"].append(f"{label_name}")
         for identifier in identifiers:
             if identifier in new_holding_infos:
                 valuations[identifier].append(new_holding_infos[identifier]["total_price"])
@@ -133,9 +134,26 @@ def main():
     for identifier in identifiers:
         df[identifier] = df[identifier].astype(float)
     fig = df.set_index('Labels').plot(kind='bar', stacked=True, xlabel="Time", ylabel="Portfolio value in USD", title="Valuations of Portfolio", rot=XROT, figsize=FIGSIZE)
-    for c in fig.containers:
-        labels = [np.round(v.get_height(), ROUND_TO) if v.get_height() > MIN_HEIGHT else '' for v in c]
-        fig.bar_label(c, labels=labels, label_type='center')
+    for label, total_price in df.set_index('Labels').sum(axis=1).reset_index(drop=True).items():
+        fig.text(label, total_price + Y_OFFSET, round(total_price), ha='center', weight='bold')
+    for bar in fig.patches:
+        fig.text(
+            # Put the text in the middle of each bar. get_x returns the start
+            # so we add half the width to get to the middle.
+            bar.get_x() + (bar.get_width() / 2),
+            # Vertically, add the height of the bar to the start of the bar,
+            # along with the offset.
+            bar.get_y() + (bar.get_height() / 2),
+            # This is actual value we'll show.
+            round(bar.get_height()),
+            # Center the labels and style them a bit.
+            ha='center',
+            color='w',
+            weight='bold',
+        )
+    # for c in fig.containers:
+    #     labels = [np.round(v.get_height(), ROUND_TO) if v.get_height() > MIN_HEIGHT else '' for v in c]
+    #     fig.bar_label(c, labels=labels, label_type='center')
     if RESULTS_DIR:
         plt.savefig(Path(RESULTS_DIR) / "valuations.png")
         print("Plot generated")
