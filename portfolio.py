@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import datetime
+import pytz
 
 metadata_fp = "portfolio.yaml"
+pst = pytz.timezone("America/Los_Angeles")
 
 STOCK_TICKER_LENGTH = 3
 SLEEP_TIME = 60 + 10
@@ -24,6 +26,7 @@ MIN_HEIGHT = 0
 XROT = 45
 Y_OFFSET = 4
 FIGSIZE=(20,20)
+HOUR_THRESHOLD=23
 
 POLYGON_API_KEY = os.environ['POLYGON_API_KEY']
 try:
@@ -89,7 +92,9 @@ def main(ci=False):
     if RESULTS_DIR:
         Path(RESULTS_DIR).mkdir(exist_ok=False)
     if ci:
-        today_date = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        today_date = datetime.datetime.now(pst).replace(tzinfo=None)
+        if today_date.hour < HOUR_THRESHOLD:
+            today_date = today_date - datetime.timedelta(days=1)
         metadata_dict["PORTFOLIO_VALUATION"]["DATES"] = [today_date]
         metadata_dict["PORTFOLIO_VALUATION"]["LABELS"] = [f"Valuation for {today_date.month}/{today_date.day}/{today_date.year}"]
     for portfolio_idx, portfolio_valuation_date in enumerate(metadata_dict["PORTFOLIO_VALUATION"]["DATES"]):
@@ -172,8 +177,12 @@ def main(ci=False):
         print("Plot generated")
     if ci:
         message = metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0] + " is"
+        total = 0
         for identifier in identifiers:
+            total += float(valuations[identifier][0])
             message = f"{message} {identifier}: {valuations[identifier][0]},"
+        message = f"{message} TOTAL: {total}"
+        print(message)
         if DISCORD_API_KEY and DISCORD_CHANNEL_ID:
             import discord
             intents = discord.Intents.default()
