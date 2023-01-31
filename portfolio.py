@@ -10,6 +10,7 @@ import os
 import sys
 import datetime
 import pytz
+import shutil
 
 metadata_fp = "portfolio.yaml"
 pst = pytz.timezone("America/Los_Angeles")
@@ -21,6 +22,7 @@ STOCK_PRICE_VALUATION_INDICATOR = "close"
 OPTION_PRICE_PURCHASE_INDICATOR = "low"
 OPTION_PRICE_VALUATION_INDICATOR = "close"
 RESULTS_DIR = "results"
+RESULTS_ZIP_FILENAME = "results"
 ROUND_TO = 2
 MIN_HEIGHT = 0
 XROT = 45
@@ -184,6 +186,8 @@ def main(ci=False):
         message = f"{message} TOTAL: {total}"
         print(message)
         if DISCORD_API_KEY and DISCORD_CHANNEL_ID:
+            if RESULTS_DIR:
+                shutil.make_archive(RESULTS_ZIP_FILENAME, 'zip', RESULTS_DIR)
             import discord
             intents = discord.Intents.default()
             client = discord.Client(intents=intents)
@@ -191,6 +195,8 @@ def main(ci=False):
             async def on_ready():
                 channel = client.get_channel(int(DISCORD_CHANNEL_ID))
                 await channel.send(message)
+                if RESULTS_DIR:
+                    await channel.send(file=discord.File(f"{RESULTS_ZIP_FILENAME}.zip"))
                 await client.close()
             client.run(DISCORD_API_KEY)
     else:
