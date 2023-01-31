@@ -7,6 +7,8 @@ from pathlib import Path
 from dataclasses import dataclass, asdict
 import matplotlib.pyplot as plt
 import os
+import sys
+import datetime
 
 metadata_fp = "portfolio.yaml"
 
@@ -23,7 +25,13 @@ XROT = 45
 Y_OFFSET = 4
 FIGSIZE=(20,20)
 
-API_KEY = os.environ['API_KEY']
+POLYGON_API_KEY = os.environ['POLYGON_API_KEY']
+try:
+    DISCORD_API_KEY = os.environ['DISCORD_API_KEY']
+    DISCORD_CHANNEL_ID = os.environ['DISCORD_CHANNEL_ID']
+except:
+    DISCORD_API_KEY = None
+    DISCORD_CHANNEL_ID = None
 
 @dataclass
 class HoldingItem:
@@ -47,14 +55,14 @@ def is_purchase_stock(ticker):
     return len(ticker) == STOCK_TICKER_LENGTH
 
 def generate_url_request(url, ticker, year, month, day):
-    response = requests.get(url.replace("{ticker}", ticker).replace("{YYYY}", year).replace("{MM}", month).replace("{DD}", day).replace("{apiKey}", API_KEY))
+    response = requests.get(url.replace("{ticker}", ticker).replace("{YYYY}", year).replace("{MM}", month).replace("{DD}", day).replace("{apiKey}", POLYGON_API_KEY))
     if not response.ok:
         for i in range(SLEEP_TIME):
             print(f"Sleeping for {SLEEP_TIME - i}")
             time.sleep(1)
     else:
         return response.json()
-    response = requests.get(url.replace("{ticker}", ticker).replace("{YYYY}", year).replace("{MM}", month).replace("{DD}", day).replace("{apiKey}", API_KEY))
+    response = requests.get(url.replace("{ticker}", ticker).replace("{YYYY}", year).replace("{MM}", month).replace("{DD}", day).replace("{apiKey}", POLYGON_API_KEY))
     if not response.ok:
         print("Something went wrong", url, ticker, year, month, day)
         exit()
@@ -69,7 +77,7 @@ def get_price(ticker, year, month, day, indicator):
         response = generate_url_request(get_option_price_url, ticker, year, month, day)
         return float(response[indicator])
 
-def main():
+def main(ci=False):
     valuations = {
         "Labels": []
     }
@@ -80,6 +88,10 @@ def main():
         valuations[identifier] = []
     if RESULTS_DIR:
         Path(RESULTS_DIR).mkdir(exist_ok=False)
+    if ci:
+        today_date = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        metadata_dict["PORTFOLIO_VALUATION"]["DATES"] = [today_date]
+        metadata_dict["PORTFOLIO_VALUATION"]["LABELS"] = [f"Valuation for {today_date.month}/{today_date.day}/{today_date.year}"]
     for portfolio_idx, portfolio_valuation_date in enumerate(metadata_dict["PORTFOLIO_VALUATION"]["DATES"]):
         holdings = {
             "BANK": HoldingItem("BANK", 1, metadata_dict["BANK"]["INITIAL_MONEY"], metadata_dict["BANK"]["INITIAL_MONEY"]),
@@ -130,6 +142,7 @@ def main():
             with open(Path(RESULTS_DIR) / f"valuation_{valuation_year}_{valuation_month}_{valuation_day}.txt", "w") as fp:
                 fp.write(str(total_portfolio_value))
             print(f"Valuation at {valuation_year}/{valuation_month}/{valuation_day} saved")
+    print(valuations)
     df = pd.DataFrame(valuations)
     for identifier in identifiers:
         df[identifier] = df[identifier].astype(float)
@@ -157,7 +170,24 @@ def main():
     if RESULTS_DIR:
         plt.savefig(Path(RESULTS_DIR) / "valuations.png")
         print("Plot generated")
-    plt.show()
-
+    if ci:
+        message = metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0] + " is"
+        for identifier in identifiers:
+            message = f"{message} {identifier}: {valuations[identifier][0]},"
+        if DISCORD_API_KEY and DISCORD_CHANNEL_ID:
+            import discord
+            intents = discord.Intents.default()
+            client = discord.Client(intents=intents)
+            @client.event
+            async def on_ready():
+                channel = client.get_channel(int(DISCORD_CHANNEL_ID))
+                await channel.send(message)
+                await client.close()
+            client.run(DISCORD_API_KEY)
+    else:
+        plt.show()
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) <= 1:
+        main()
+    else:
+        main(True)

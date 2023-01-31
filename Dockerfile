@@ -8,4 +8,4 @@ RUN apt update && \
 
 RUN pip3 install --upgrade pip
 
-RUN pip3 install --no-cache pandas seaborn matplotlib numpy pyyaml requests
+RUN pip3 install --no-cache pandas seaborn matplotlib numpy pyyaml requests pytz discord

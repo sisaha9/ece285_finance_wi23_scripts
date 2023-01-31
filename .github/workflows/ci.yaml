@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - master
+  schedule:
+    - cron: "0 9 * * *"
 
 jobs:
   run-ci:
@@ -14,10 +16,19 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Run Script
+        if: ${{ github.event_name != 'schedule' }}
         env:
-          API_KEY: ${{ secrets.API_KEY }}
+          POLYGON_API_KEY: ${{ secrets.API_KEY }}
         run: |
           python3 portfolio.py
+      - name: Run Script CI
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          DISCORD_API_KEY: ${{ secrets.DISCORD_API_KEY }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        run: |
+          python3 portfolio.py --ci
       - name: Upload Run results
         uses: actions/upload-artifact@v3
         with:
