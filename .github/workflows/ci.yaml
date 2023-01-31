@@ -17,13 +17,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Run Script
-        if: ${{ github.event_name != 'schedule' }}
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
           python3 portfolio.py
       - name: Run Script CI
-        if: ${{ github.event_name == 'schedule' }}
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
           DISCORD_API_KEY: ${{ secrets.DISCORD_API_KEY }}
