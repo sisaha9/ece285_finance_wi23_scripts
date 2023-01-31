@@ -1,11 +1,11 @@
 name: ECE 285 CI
 
 on:
+  schedule:
+    - cron: '15 9 * * *'
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: '15 9 * * *'
 
 jobs:
   run-ci:
