@@ -2,7 +2,7 @@ name: ECE 285 CI
 
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 5 * * *'
   pull_request:
     branches:
       - master
