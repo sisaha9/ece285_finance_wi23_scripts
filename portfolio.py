@@ -86,6 +86,9 @@ def main(ci=False):
     valuations = {
         "Labels": []
     }
+    dfs = {
+
+    }
     trade_history = pd.read_csv(metadata_dict["DATA"]["TRADE_HISTORY"])
     trade_history["Date Bought"] = pd.to_datetime(trade_history["Date Bought"])
     identifiers = ['BANK'] + trade_history['Ticker'].values.tolist()
@@ -136,6 +139,7 @@ def main(ci=False):
         df["total_price"] = df["total_price"].astype(float)
         total_portfolio_value = df["total_price"].sum()
         print(df)
+        dfs[metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][portfolio_idx]] = df
         print(total_portfolio_value)
         label_name = metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][portfolio_idx]
         valuations["Labels"].append(f"{label_name}")
@@ -178,12 +182,18 @@ def main(ci=False):
         plt.savefig(Path(RESULTS_DIR) / "valuations.png")
         print("Plot generated")
     if ci:
-        message = metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0] + " is"
-        total = 0
+        message = dfs[metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0]].to_string()
+        message = message + "\n"
+        total_portfolio_value = np.round(dfs[metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0]]["total_price"].sum(), ROUND_TO)
+        total_profit = np.round(total_portfolio_value - metadata_dict["BANK"]["INITIAL_MONEY"], ROUND_TO)
+        message = message + metadata_dict["PORTFOLIO_VALUATION"]["LABELS"][0] + " is"
         for identifier in identifiers:
-            total += float(valuations[identifier][0])
             message = f"{message} {identifier}: {valuations[identifier][0]},"
-        message = f"{message} TOTAL: {total}"
+        if len(identifiers) > 0:
+            message = message[:-1]
+        message = f"{message}\n"
+        message = f"{message}The total portfolio value is: {total_portfolio_value}\nThe total profit is: {total_profit}"
+        message = f"```\n{message}\n```"
         print(message)
         if DISCORD_API_KEY and DISCORD_CHANNEL_ID:
             if RESULTS_DIR:
