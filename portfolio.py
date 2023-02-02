@@ -17,9 +17,9 @@ pst = pytz.timezone("America/Los_Angeles")
 
 STOCK_TICKER_LENGTH = 3
 SLEEP_TIME = 60 + 10
-STOCK_PRICE_PURCHASE_INDICATOR = "low"
+STOCK_PRICE_PURCHASE_INDICATOR = "listed"
 STOCK_PRICE_VALUATION_INDICATOR = "close"
-OPTION_PRICE_PURCHASE_INDICATOR = "low"
+OPTION_PRICE_PURCHASE_INDICATOR = "listed"
 OPTION_PRICE_VALUATION_INDICATOR = "close"
 RESULTS_DIR = "results"
 RESULTS_ZIP_FILENAME = "results"
@@ -117,7 +117,10 @@ def main(ci=False):
             purchase_month = '{:02}'.format(row["Date Bought"].month)
             purchase_day = '{:02}'.format(row["Date Bought"].day)
             if is_purchase_stock(ticker):
-                purchase_price = get_price(ticker, purchase_year, purchase_month, purchase_day, STOCK_PRICE_PURCHASE_INDICATOR)
+                if STOCK_PRICE_PURCHASE_INDICATOR == "listed":
+                    purchase_price = float(row["Purchase Price"])
+                else:
+                    purchase_price = get_price(ticker, purchase_year, purchase_month, purchase_day, STOCK_PRICE_PURCHASE_INDICATOR)
                 current_price = get_price(ticker, valuation_year, valuation_month, valuation_day, STOCK_PRICE_VALUATION_INDICATOR)
             else:
                 if OPTION_PRICE_PURCHASE_INDICATOR == "listed":
