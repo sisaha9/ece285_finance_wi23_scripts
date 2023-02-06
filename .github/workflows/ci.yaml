@@ -21,7 +21,7 @@ jobs:
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         run: |
-          python3 portfolio.py
+          python3 main.py
       - name: Run Script CI
         if: ${{ github.event_name != 'pull_request' }}
         env:
@@ -29,7 +29,7 @@ jobs:
           DISCORD_API_KEY: ${{ secrets.DISCORD_API_KEY }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: |
-          python3 portfolio.py --ci
+          python3 main.py --ci
       - name: Upload Run results
         uses: actions/upload-artifact@v3
         with:
