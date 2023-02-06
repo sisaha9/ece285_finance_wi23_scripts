@@ -8,3 +8,7 @@ run-container:
 join-session:
 	@CONT_NAME="${CONT_NAME}"
 	docker exec -it ${CONT_NAME} /bin/bash
+
+reformat:
+	autoflake --in-place --remove-unused-variables --remove-all-unused-imports --ignore-init-module-imports -r ${PATHS}
+	black -l 99 ${PATHS}
