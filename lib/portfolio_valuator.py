@@ -21,7 +21,7 @@ class PortfolioHandler:
             "Value Per Share": self.current_bank_account,
             "Total": self.current_bank_account,
             "Profit": self.current_bank_account - BANK_INITIAL_MONEY,
-            "Evaluation Date": evaluation_date,
+            "Evaluation Date": evaluation_date.to_pydatetime().date(),
         }
         for ticker in self.trade_history.keys():
             current_value_per_share, date_evaluated = get_price(
@@ -39,7 +39,7 @@ class PortfolioHandler:
                 portfolio_valuation_result[f"{ticker}-{id}"]["Profit"] = (
                     current_value_per_share - self.trade_history[ticker][id]["Price"]
                 ) * self.trade_history[ticker][id]["Shares"]
-                portfolio_valuation_result[f"{ticker}-{id}"]["Evaluation Date"] = date_evaluated
+                portfolio_valuation_result[f"{ticker}-{id}"]["Evaluation Date"] = date_evaluated.to_pydatetime().date()
         evaluation_result_df = (
             pd.DataFrame(portfolio_valuation_result)
             .transpose()

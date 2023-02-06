@@ -78,9 +78,9 @@ def get_closest_date_to_date(date: datetime.datetime):
         new_date.date() == datetime.datetime.now(TZ_PRESENT).date()
         and new_date.hour < POLYGON_HOUR_THRESHOLD
     ):
-        new_date = date - datetime.timedelta(days=1)
+        new_date = new_date - datetime.timedelta(days=1)
     if new_date.weekday() == 6:
-        new_date = date - datetime.timedelta(days=2)
+        new_date = new_date - datetime.timedelta(days=2)
     elif new_date.weekday() == 5:
-        new_date = date - datetime.timedelta(days=1)
+        new_date = new_date - datetime.timedelta(days=1)
     return new_date
