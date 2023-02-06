@@ -33,7 +33,7 @@ def main(session: CachedLimiterSession, ci=False):
     labels = None
     portfolio_valuation_results = {}
     plot_list = {"Labels": []}
-    message = ""
+    message = "```\n"
     if ci:
         date = pd.to_datetime(datetime.datetime.now(TZ_PRESENT))
         dates = [date]
@@ -69,6 +69,7 @@ def main(session: CachedLimiterSession, ci=False):
                 plot_list[ticker] = [val]
         save_evaluation(portfolio_valuation_results[labels[idx]], dates[idx])
         print(f"Evaluation done for {labels[idx]}")
+    message = f"{message}```"
     plot_df = pd.DataFrame(plot_list)
     generate_valuations_barplot(plot_df)
     make_zip_file()
