@@ -70,12 +70,16 @@ def limit_date_option(ticker: str, date: datetime.datetime):
     new_date = date
     if not is_purchase_stock(ticker):
         new_date = extract_option_expiration(ticker)
-    return new_date
+        if new_date.date() < date.date():
+            return new_date, True
+    return date, False
 
 
 def get_price(ticker: str, date: datetime.datetime, indicator: str, session: CachedLimiterSession):
-    new_date = limit_date_option(ticker, date)
+    new_date, stop_evaluation = limit_date_option(ticker, date)
     new_date = get_closest_date_to_date(new_date)
+    if stop_evaluation:
+        return 0.0, pd.to_datetime(new_date)
     year = "{:04}".format(new_date.year)
     month = "{:02}".format(new_date.month)
     day = "{:02}".format(new_date.day)

@@ -18,6 +18,7 @@ class PortfolioHandler:
         portfolio_valuation_result = {}
         portfolio_valuation_result["BANK"] = {
             "Num Shares": 1,
+            "Bought At": BANK_INITIAL_MONEY,
             "Value Per Share": self.current_bank_account,
             "Total": self.current_bank_account,
             "Profit": self.current_bank_account - BANK_INITIAL_MONEY,
@@ -30,6 +31,7 @@ class PortfolioHandler:
             for id in self.trade_history[ticker].keys():
                 portfolio_valuation_result[f"{ticker}-{id}"] = {
                     "Num Shares": self.trade_history[ticker][id]["Shares"],
+                    "Bought At": self.trade_history[ticker][id]["Price"],
                     "Value Per Share": current_value_per_share,
                 }
                 portfolio_valuation_result[f"{ticker}-{id}"]["Total"] = (
@@ -51,6 +53,7 @@ class PortfolioHandler:
                 {
                     "Ticker": "string",
                     "Num Shares": "int64",
+                    "Bought At": "float64",
                     "Value Per Share": "float64",
                     "Total": "float64",
                     "Profit": "float64",
