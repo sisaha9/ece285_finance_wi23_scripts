@@ -56,8 +56,26 @@ def get_price_polygon(
         return float(response[indicator])
 
 
+def extract_option_expiration(ticker: str):
+    relevant_portion = ticker[3:9]
+    new_date = datetime.datetime(
+        year=int("20" + relevant_portion[:2]),
+        month=int(relevant_portion[2:4]),
+        day=int(relevant_portion[4:]),
+    )
+    return new_date
+
+
+def limit_date_option(ticker: str, date: datetime.datetime):
+    new_date = date
+    if not is_purchase_stock(ticker):
+        new_date = extract_option_expiration(ticker)
+    return new_date
+
+
 def get_price(ticker: str, date: datetime.datetime, indicator: str, session: CachedLimiterSession):
-    new_date = get_closest_date_to_date(date)
+    new_date = limit_date_option(ticker, date)
+    new_date = get_closest_date_to_date(new_date)
     year = "{:04}".format(new_date.year)
     month = "{:02}".format(new_date.month)
     day = "{:02}".format(new_date.day)

@@ -39,12 +39,24 @@ class PortfolioHandler:
                 portfolio_valuation_result[f"{ticker}-{id}"]["Profit"] = (
                     current_value_per_share - self.trade_history[ticker][id]["Price"]
                 ) * self.trade_history[ticker][id]["Shares"]
-                portfolio_valuation_result[f"{ticker}-{id}"]["Evaluation Date"] = date_evaluated.to_pydatetime().date()
+                portfolio_valuation_result[f"{ticker}-{id}"][
+                    "Evaluation Date"
+                ] = date_evaluated.to_pydatetime().date()
         evaluation_result_df = (
             pd.DataFrame(portfolio_valuation_result)
             .transpose()
             .reset_index()
             .rename({"index": "Ticker"}, axis=1)
+            .astype(
+                {
+                    "Ticker": "string",
+                    "Num Shares": "int64",
+                    "Value Per Share": "float64",
+                    "Total": "float64",
+                    "Profit": "float64",
+                    "Evaluation Date": "datetime64[ns]",
+                }
+            )
         )
         return evaluation_result_df
 
