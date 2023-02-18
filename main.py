@@ -10,6 +10,7 @@ from settings import (
     RESULTS_DIR,
     BANK_INITIAL_MONEY,
     ROUND_TO,
+    SEND_MESSAGE,
 )
 from lib.portfolio_valuator import PortfolioHandler
 from lib.viz import generate_valuations_barplot
@@ -74,7 +75,12 @@ def main(session: CachedLimiterSession, ci=False):
     generate_valuations_barplot(plot_df)
     make_zip_file()
     print(message.strip())
-    send_message(message.strip())
+    if SEND_MESSAGE or ci:
+        send_message(message.strip())
+    else:
+        send_message(
+            "Omitted sending the CSV form of the message we normally send as it's too large. Check out the zip file for the usual"
+        )
 
 
 if __name__ == "__main__":

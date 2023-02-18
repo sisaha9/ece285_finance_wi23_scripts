@@ -2,6 +2,7 @@ import time
 import pandas as pd
 import datetime
 from lib.sessions import CachedLimiterSession
+from typing import Tuple, Dict
 from settings import (
     POLYGON_API_KEY,
     POLYGON_STOCK_PRICE_URL,
@@ -15,7 +16,7 @@ from settings import (
 
 def generate_url_request(
     url: str, ticker: str, year: str, month: str, day: str, session: CachedLimiterSession
-):
+) -> Dict:
     response = session.get(
         url.replace("{ticker}", ticker)
         .replace("{YYYY}", year)
@@ -45,7 +46,7 @@ def generate_url_request(
 
 def get_price_polygon(
     ticker: str, year: str, month: str, day: str, indicator: str, session: CachedLimiterSession
-):
+) -> float:
     if is_purchase_stock(ticker):
         response = generate_url_request(POLYGON_STOCK_PRICE_URL, ticker, year, month, day, session)
         return float(response[indicator])
@@ -56,7 +57,7 @@ def get_price_polygon(
         return float(response[indicator])
 
 
-def extract_option_expiration(ticker: str):
+def extract_option_expiration(ticker: str) -> datetime.datetime:
     relevant_portion = ticker[3:9]
     new_date = datetime.datetime(
         year=int("20" + relevant_portion[:2]),
@@ -66,7 +67,7 @@ def extract_option_expiration(ticker: str):
     return new_date
 
 
-def limit_date_option(ticker: str, date: datetime.datetime):
+def limit_date_option(ticker: str, date: datetime.datetime) -> Tuple[datetime.datetime, bool]:
     new_date = date
     if not is_purchase_stock(ticker):
         new_date = extract_option_expiration(ticker)
@@ -75,7 +76,9 @@ def limit_date_option(ticker: str, date: datetime.datetime):
     return date, False
 
 
-def get_price(ticker: str, date: datetime.datetime, indicator: str, session: CachedLimiterSession):
+def get_price(
+    ticker: str, date: datetime.datetime, indicator: str, session: CachedLimiterSession
+) -> Tuple[float, pd.Timestamp]:
     new_date, stop_evaluation = limit_date_option(ticker, date)
     new_date = get_closest_date_to_date(new_date)
     if stop_evaluation:
@@ -88,11 +91,21 @@ def get_price(ticker: str, date: datetime.datetime, indicator: str, session: Cac
     )
 
 
-def is_purchase_stock(ticker: str):
+def is_purchase_stock(ticker: str) -> bool:
     return len(ticker) == STOCK_TICKER_LENGTH
 
 
-def get_closest_date_to_date(date: datetime.datetime):
+def is_purchase_call(ticker: str) -> bool:
+    if not is_purchase_stock(ticker):
+        return ticker[9] == "C"
+
+
+def is_purchase_put(ticker: str) -> bool:
+    if not is_purchase_stock(ticker):
+        return ticker[9] == "P"
+
+
+def get_closest_date_to_date(date: datetime.datetime) -> datetime.datetime:
     new_date = date
     if date.date() > datetime.datetime.now(TZ_PRESENT).date():
         new_date = datetime.datetime.now(TZ_PRESENT)

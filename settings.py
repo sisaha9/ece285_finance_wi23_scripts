@@ -11,8 +11,22 @@ DT_TO_LOOKUP = TZ_PRESENT.localize(current_dt) - TZ_LOOKUP.localize(current_dt)
 del current_dt
 TRADE_HISTORY = "data/TradeHistory.csv"
 BANK_INITIAL_MONEY = 10000.0
-PORTFOLIO_VALUATION_DATES = ["1/13/2023", "1/20/2023", "1/27/2023", "2/3,2023"]
-PORTFOLIO_VALUATION_LABELS = ["End of Week 1", "End of Week 2", "End of Week 3", "End of Week 4"]
+PORTFOLIO_VALUATION_DATES = [
+    "1/13/2023",
+    "1/20/2023",
+    "1/27/2023",
+    "2/3,2023",
+    "2/10/2023",
+    "2/17/2023",
+]
+PORTFOLIO_VALUATION_LABELS = [
+    "End of Week 1",
+    "End of Week 2",
+    "End of Week 3",
+    "End of Week 4",
+    "End of Week 5",
+    "End of Week 6",
+]
 RESULTS_DIR = "results"
 ROUND_TO = 2
 
@@ -41,3 +55,4 @@ POLYGON_OPTION_PRICE_URL = "https://api.polygon.io/v1/open-close/O:{ticker}/{YYY
 STOCK_TICKER_LENGTH = 3
 POLYGON_HOUR_THRESHOLD = 21
 POLYGON_VALUATION_INDICATOR = "close"
+SEND_MESSAGE = False

@@ -12,3 +12,6 @@ join-session:
 reformat:
 	autoflake --in-place --remove-unused-variables --remove-all-unused-imports --ignore-init-module-imports -r ${PATHS}
 	black -l 99 ${PATHS}
+
+clean:
+	@rm -rf results/ results.zip

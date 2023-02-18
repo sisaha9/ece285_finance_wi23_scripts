@@ -3,7 +3,7 @@ from pathlib import Path
 from settings import DISCORD_API_KEY, DISCORD_CHANNEL_ID, RESULTS_DIR
 
 
-def send_message(msg: str):
+def send_message(msg: str) -> bool:
     if DISCORD_API_KEY is None or DISCORD_CHANNEL_ID is None:
         return False
     intents = discord.Intents.default()
