@@ -5,7 +5,7 @@ Instructions:
 
 Running locally:
 
-1. To run type `API_KEY="<api_key>" python3 portfolio.py`
+1. To run type `POLYGON_API_KEY="<api_key>" python3 main.py`
 
 Running on Github CI:
 
