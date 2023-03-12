@@ -18,6 +18,9 @@ PORTFOLIO_VALUATION_DATES = [
     "2/3,2023",
     "2/10/2023",
     "2/17/2023",
+    "2/24/2023",
+    "3/3/2023",
+    "3/10/2023",
 ]
 PORTFOLIO_VALUATION_LABELS = [
     "End of Week 1",
@@ -26,6 +29,9 @@ PORTFOLIO_VALUATION_LABELS = [
     "End of Week 4",
     "End of Week 5",
     "End of Week 6",
+    "End of Week 7",
+    "End of Week 8",
+    "End of Week 9",
 ]
 RESULTS_DIR = "results"
 ROUND_TO = 2
