@@ -29,7 +29,7 @@ jobs:
         run: |
           python3 main.py --ci
       - name: Upload Run results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: run-results
           path: results/
